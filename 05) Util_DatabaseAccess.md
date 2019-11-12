@@ -1,4 +1,4 @@
-<h2>DastabaseAccess_MOD</h2>
+<h2>Util_DatabaseAccess</h2>
 
 <pre>
 Public DBCn As ADODB.Connection
