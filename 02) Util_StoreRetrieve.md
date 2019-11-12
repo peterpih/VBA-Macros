@@ -1,6 +1,16 @@
 <h2>Util_StoreRetrieve</h2>
 
 <pre>
+'
+' November 12, 2019
+' Routines for saving fetching Username and Password
+'
+' Row locations on TopSheet
+Public Const PASSWORDROW = 1
+Public Const USERNAMEROW = 2
+Public Const ACTIVEWORKBOOKROW = 3
+Public Const ACTIVESHEETROW = 4
+'
 Function StorePassword(Password)
     With ThisWorkbook.Sheets("TopSheet")
         .Cells(1, 1).Font.ThemeColor = xlThemeColorDark1
@@ -26,34 +36,69 @@ Function RetrieveUserName(Optional UserName) As String
     UserName = ThisWorkbook.Sheets("TopSheet").Cells(2, 1)
     RetrieveUserName = UserName
 End Function
-Function StoreCurrentWorkbook(WBName)
-    With ThisWorkbook.Sheets("TopSheet")
-        .Cells(3, 1).Font.ThemeColor = xlThemeColorDark1
-        .Cells(3, 1).Font.TintAndShade = 0
-        .Cells(3, 1) = WBName
-    End With
+'------------------------------------------------------------------------------------------
+Sub test()
+Dim t() As String
+    t() = Split("A1,$a$6,zoo", ",")
+    
+    For i = 0 To UBound(t)
+        Debug.Print t(i)
+        
+    Next i
+    For Each R In Selection
+    Debug.Print R.Column
+    Next R
+End Sub
+
+Function CheckTopSheet() As Boolean
+    WBActive = ActiveWorkbook.Name
+    SHActive = ActiveSheet.Name
+    On Error GoTo NameTopSheet
+        t = ThisWorkbook.Sheets("TopSheet").Name
+        CheckTopSheet = True
+        GoTo EndReturn
+NameTopSheet:
+    If ThisWorkbook.Sheets.Count >= 1 Then
+        ThisWorkbook.Sheets(1).Name = "TopSheet"
+    End If
+    CheckTopSheet = True
+EndReturn:
+    On Error GoTo 0
+    'Workbooks(WBActive).Sheets(SHActive).Activate
 End Function
 
-Function RetrieveCurrentWorkbook(Optional WBName) As String
-    WBName = ThisWorkbook.Sheets("TopSheet").Cells(3, 1)
-    RetrieveCurrentWorkbook = WBName
+Function GetActiveWorkbook(Optional WBName) As String
+
+    If Not IsMissing(WBName) Then WBName = ThisWorkbook.Sheets("TopSheet").Cells(ACTIVEWORKBOOKROW, 1)
+    GetActiveWorkbook = ThisWorkbook.Sheets("TopSheet").Cells(ACTIVEWORKBOOKROW, 1)
+    
 End Function
 
-Function StoreCurrentSheet(SHName)
-    With ThisWorkbook.Sheets("TopSheet")
-        .Cells(4, 1).Font.ThemeColor = xlThemeColorDark1
-        .Cells(4, 1).Font.TintAndShade = 0
-        .Cells(4, 1) = SHName
-    End With
+Function SetActiveWorkbook(Optional WBName) As String
+
+    Call CheckTopSheet
+    If Not IsMissing(WBName) Then
+        t = Workbooks(WBName).Name '= WBName  ' this is a read only property, need to .saveas to change name
+        ThisWorkbook.Sheets("TopSheet").Cells(ACTIVEWORKBOOKROW, 1) = WBName
+    End If
+    SetActiveWorkbook = WBName
+    
 End Function
 
-Function RetrieveCurrentSheet(Optional SHName) As String
-    SHName = ThisWorkbook.Sheets("TopSheet").Cells(4, 1)
-    RetrieveCurrentSheet = SHName
+Function GetActiveSheet(Optional SHName) As String
+
+    If Not IsMissing(SHName) Then SHName = ThisWorkbook.Sheets("TopSheet").Cells(ACTIVESHEETROW, 1)
+    GetActiveSheet = ThisWorkbook.Sheets("TopSheet").Cells(ACTIVESHEETROW, 1)
+    
 End Function
 
-Function StoreActiveWorkbookSheet()
-    Call StoreCurrentWorkbook(ActiveWorkbook.Name)
-    Call StoreCurrentSheet(ActiveSheet.Name)
+Function SetActiveSheet(Optional SHName) As String
+
+    Call CheckTopSheet
+    If Not IsMissing(SHName) Then
+        ThisWorkbook.Sheets("TopSheet").Cells(ACTIVESHEETROW, 1) = SHName
+    End If
+    SetActiveSheet = SHName
+    
 End Function
 </pre>
