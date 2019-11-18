@@ -1,6 +1,18 @@
 
 <pre>
-Function RunMyQuery(useQuery, outputRange, Optional showHeaders) As Boolean
+'--------------------------------------------------------------------------------------------
+' November 18, 2019
+'
+Function RunMyQuery_test()
+Dim db As Workbook
+    Set wb = Workbooks.Add
+    Set outRange = wb.ActiveSheet.Cells(1, 1)
+    
+    t = "select * from m_services"
+    Call RunMyQuery(t, outRange)
+End Function
+
+Function RunMyQuery(useQuery, Optional outputRange, Optional showHeaders)
 Dim DBCn As ADODB.Connection
 Dim DBRs As ADODB.Recordset
 
@@ -19,15 +31,7 @@ On Error GoTo gotError
 
 100   DBRs.Open useQuery, DBCn
     
-        If DBRs.State = 0 Then   ' closed
-            If InStr(UCase(useQuery), "INSERT") > 0 Or InStr(UCase(useQuery), "UPDATE") > 0 Then
-                RunMyQuery = True
-                Exit Function
-            Else
-                GoTo gotError
-            End If
-        End If
-        
+        If IsMissing(outputRange) Then Exit Function
         Offset = 0
         If showHeaders Then Offset = 1
         recordCount = DBRs.recordCount
@@ -47,6 +51,8 @@ On Error GoTo gotError
             DBRs.MoveNext
         Next i
 
+
+        
         Call DBCloseRecordset(DBRs)
         Call DBCloseConnection(DBCn)
 120   Exit Function
